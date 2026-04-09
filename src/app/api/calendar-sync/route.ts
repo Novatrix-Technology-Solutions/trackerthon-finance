@@ -37,11 +37,13 @@ export async function POST(request: Request) {
 
     // Prepare Event Payload
     let eventPayload: any = {};
+    const currency = body.currency || '$';
+
     if (body.type === 'debt') {
       const debt = body.data;
       eventPayload = {
         summary: `Due: ${debt.creditor} Payment`,
-        description: `Remaining: $${debt.remaining} | Principal: $${debt.principal}`,
+        description: `Remaining: ${currency}${debt.remaining} | Principal: ${currency}${debt.principal}`,
         start: { date: debt.due_date },
         end: { date: debt.due_date }
       };
@@ -49,7 +51,7 @@ export async function POST(request: Request) {
       const sub = body.data;
       eventPayload = {
         summary: `Bill: ${sub.subscription_name}`,
-        description: `Amount: $${sub.amount} | Category: ${sub.category}`,
+        description: `Amount: ${currency}${sub.amount} | Category: ${sub.category}`,
         start: { date: sub.next_billing_date },
         end: { date: sub.next_billing_date }
       };

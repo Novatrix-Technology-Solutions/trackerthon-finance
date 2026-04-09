@@ -43,7 +43,8 @@ export default function DebtsPage() {
         body: JSON.stringify({ 
           type: 'debt', 
           action, 
-          data: debtData 
+          data: debtData,
+          currency: currencyStr
         })
       });
       const result = await res.json();
@@ -72,8 +73,16 @@ export default function DebtsPage() {
         .select();
 
       if (data) {
-        setDebts(debts.map(d => d.id === editingId ? data[0] : d));
-        syncToCalendar(data[0], 'update');
+        let updatedEntity = data[0];
+        setDebts(debts.map(d => d.id === editingId ? updatedEntity : d));
+        
+        const generatedEventId = await syncToCalendar(updatedEntity, 'update');
+        
+        // Ensure graceful ID patch if historical record spawns a new Calendar node physically
+        if (generatedEventId && !updatedEntity.calendar_event_id) {
+           const { data: patchedRecord } = await supabase.from('debts').update({ calendar_event_id: generatedEventId }).eq('id', editingId).select();
+           if (patchedRecord) setDebts(debts.map(d => d.id === editingId ? patchedRecord[0] : d));
+        }
       }
     } else {
       const { data, error } = await supabase

@@ -43,7 +43,8 @@ export default function RecurringPage() {
         body: JSON.stringify({ 
           type: 'recurring_payment', 
           action, 
-          data: paymentData 
+          data: paymentData,
+          currency: currencyStr
         })
       });
       const result = await res.json();
@@ -73,9 +74,17 @@ export default function RecurringPage() {
         .select();
 
       if (data) {
-        setPayments(payments.map(p => p.id === editingId ? data[0] : p));
-        // 2. Mock Background sync to Calendar
-        syncToCalendar(data[0], 'update');
+        let updatedEntity = data[0];
+        setPayments(payments.map(p => p.id === editingId ? updatedEntity : p));
+        
+        // 2. Background sync to Calendar
+        const generatedEventId = await syncToCalendar(updatedEntity, 'update');
+        
+        // Catch gracefully created events (usually happens if editing historically generated records without IDs)
+        if (generatedEventId && !updatedEntity.calendar_event_id) {
+           const { data: patchedRecord } = await supabase.from('recurring_payments').update({ calendar_event_id: generatedEventId }).eq('id', editingId).select();
+           if (patchedRecord) setPayments(payments.map(p => p.id === editingId ? patchedRecord[0] : p));
+        }
       }
     } else {
       // 1. Insert into Supabase
