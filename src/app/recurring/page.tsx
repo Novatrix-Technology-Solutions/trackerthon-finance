@@ -141,11 +141,9 @@ export default function RecurringPage() {
     setIsFormOpen(!isFormOpen);
   };
 
-  const monthlyOutflow = payments.reduce((acc, curr) => {
-    if (curr.frequency === 'Yearly') return acc + (curr.amount / 12);
-    if (curr.frequency === 'Weekly') return acc + (curr.amount * 4.33);
-    return acc + curr.amount; // Monthly and default
-  }, 0);
+  const weeklyTotal = payments.filter(p => p.frequency === 'Weekly').reduce((acc, curr) => acc + curr.amount, 0);
+  const monthlyTotal = payments.filter(p => p.frequency === 'Monthly').reduce((acc, curr) => acc + curr.amount, 0);
+  const yearlyTotal = payments.filter(p => p.frequency === 'Yearly').reduce((acc, curr) => acc + curr.amount, 0);
 
   return (
     <div className="space-y-6">
@@ -196,14 +194,34 @@ export default function RecurringPage() {
         </div>
       )}
 
-      <div className="bg-gradient-to-r from-money-green to-money-hover text-white p-6 rounded-xl shadow-md flex items-center justify-between">
-        <div>
-          <p className="text-money-light text-sm font-medium mb-1">Estimated Monthly Outflow</p>
-          <p className="text-4xl font-bold">
-             {loading ? <span className="animate-pulse bg-money-dark h-10 w-48 rounded block mt-1"></span> : `${currencyStr}${monthlyOutflow.toFixed(2)}`}
-          </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-gradient-to-br from-green-700 to-green-900 text-white p-6 rounded-xl shadow-md flex items-center justify-between">
+          <div>
+            <p className="text-money-light text-sm font-medium mb-1">Weekly Liabilities</p>
+            <p className="text-3xl font-bold">
+               {loading ? <span className="animate-pulse bg-money-dark h-8 w-24 rounded block mt-1"></span> : `${currencyStr}${weeklyTotal.toLocaleString()}`}
+            </p>
+          </div>
+          <RefreshCw className="w-8 h-8 text-white opacity-40 ml-4" />
         </div>
-        <RefreshCw className="w-12 h-12 text-money-light opacity-80" />
+        <div className="bg-gradient-to-br from-money-green to-money-hover text-white p-6 rounded-xl shadow-md flex items-center justify-between">
+          <div>
+            <p className="text-money-light text-sm font-medium mb-1">Monthly Subscriptions</p>
+            <p className="text-3xl font-bold">
+               {loading ? <span className="animate-pulse bg-money-dark h-8 w-32 rounded block mt-1"></span> : `${currencyStr}${monthlyTotal.toLocaleString()}`}
+            </p>
+          </div>
+          <RefreshCw className="w-8 h-8 text-white opacity-40 ml-4" />
+        </div>
+        <div className="bg-gradient-to-br from-blue-700 to-blue-900 text-white p-6 rounded-xl shadow-md flex items-center justify-between">
+          <div>
+            <p className="text-blue-200 text-sm font-medium mb-1">Yearly Contracts</p>
+            <p className="text-3xl font-bold">
+               {loading ? <span className="animate-pulse bg-blue-800 h-8 w-32 rounded block mt-1"></span> : `${currencyStr}${yearlyTotal.toLocaleString()}`}
+            </p>
+          </div>
+          <RefreshCw className="w-8 h-8 text-white opacity-40 ml-4" />
+        </div>
       </div>
 
       {!loading && payments.length === 0 && (
@@ -217,7 +235,7 @@ export default function RecurringPage() {
         {payments.map(p => {
           return (
             <div key={p.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between group hover:shadow-md transition-shadow relative">
-              <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-4 right-4 flex space-x-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                 <button onClick={() => openEdit(p)} className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 transition-colors">
                   <Pencil className="w-3.5 h-3.5" />
                 </button>

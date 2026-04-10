@@ -202,7 +202,7 @@ export default function DebtsPage() {
           const progress = debt.principal > 0 ? ((debt.principal - debt.remaining) / debt.principal) * 100 : 0;
           return (
             <div key={debt.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between group hover:-translate-y-1 transition-transform relative">
-              <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-4 right-4 flex space-x-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                 <button onClick={() => openEdit(debt)} className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600 transition-colors">
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
