@@ -1,0 +1,7 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Tell Netlify's secrets scanner to ignore these public variables which are expected to be compiled into the client-side bundles
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,NEXT_PUBLIC_SUPABASE_URL"
